@@ -1,0 +1,44 @@
+#!/usr/bin/env php
+<?php
+
+use Nighten\DoctrineCheck\Cli\CheckTypesCommand;
+use Nighten\DoctrineCheck\Config\ConfigResolver;
+use Symfony\Component\Console\Application;
+
+$autoloadFile = null;
+foreach (
+    [
+        __DIR__ . '/../../../autoload.php',
+        __DIR__ . '/../../autoload.php',
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/vendor/autoload.php'
+    ] as $file
+) {
+    if (file_exists($file)) {
+        $autoloadFile = $file;
+        break;
+    }
+}
+
+unset($file);
+
+if (null === $autoloadFile) {
+    fwrite(
+        STDERR,
+        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+        '    composer install' . PHP_EOL . PHP_EOL .
+        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
+    );
+    die(1);
+}
+
+require $autoloadFile;
+unset($autoloadFile);
+
+
+$app = new Application('Check doctrine console app');
+$enumTestCommand = new CheckTypesCommand(
+    new ConfigResolver(),
+);
+$app->add($enumTestCommand);
+exit($app->run());
