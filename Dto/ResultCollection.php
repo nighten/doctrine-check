@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Dto;
 
+use Nighten\DoctrineCheck\Ignore\IgnoreStorage;
+
 class ResultCollection
 {
     /** @var Result[] */
     private array $results = [];
+
+    private IgnoreStorage $ignores;
+
+    public function __construct()
+    {
+        $this->ignores = new IgnoreStorage();
+    }
 
     public function addResult(Result $result): void
     {
@@ -57,5 +66,15 @@ class ResultCollection
             $count += $result->getProcessedFields();
         }
         return $count;
+    }
+
+    public function getIgnoreStorage(): IgnoreStorage
+    {
+        return $this->ignores;
+    }
+
+    public function setIgnoreStorage(IgnoreStorage $ignores): void
+    {
+        $this->ignores = $ignores;
     }
 }
