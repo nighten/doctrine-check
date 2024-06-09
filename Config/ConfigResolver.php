@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Config;
 
-use Doctrine\Persistence\ObjectManager;
 use Nighten\DoctrineCheck\Doctrine\DefaultMetadataReader;
 
 class ConfigResolver
