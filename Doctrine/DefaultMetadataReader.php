@@ -6,27 +6,34 @@ namespace Nighten\DoctrineCheck\Doctrine;
 
 use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\MappingException;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 class DefaultMetadataReader implements MetadataReaderInterface
 {
     /**
-     * @throws DoctrineCheckException
+     * @param ClassMetadata<object> $metadata
      * @throws MappingException
      */
     public function getFieldMapping(ClassMetadata $metadata, string $fieldName): DoctrineFieldMapping
     {
+        /**
+         * Depend on Doctrine Version
+         * @var array{
+         *      "fieldName": string,
+         *      "type": string,
+         *      "columnName": string,
+         *      "scale"?: int|null,
+         *      "length"?: int|null,
+         *      "unique"?: bool|null,
+         *      "nullable"?: bool|null,
+         *      "precision"?: int|null,
+         *  }|FieldMapping $fieldMapping
+         */
         $fieldMapping = $metadata->getFieldMapping($fieldName);
+
         //Doctrine 2
         if (is_array($fieldMapping)) {
             return $this->createFromArray($fieldMapping);
-        }
-
-        if (!$fieldMapping instanceof FieldMapping) {
-            throw new DoctrineCheckException(
-                'Unsupported field Mapping result. Probably you can add custom MetadataReader',
-            );
         }
 
         //Doctrine 3

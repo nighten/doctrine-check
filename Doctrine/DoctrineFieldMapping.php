@@ -69,6 +69,9 @@ class DoctrineFieldMapping
         $this->generated = $generated;
     }
 
+    /**
+     * @param class-string|null $enumType
+     */
     public function setEnumType(?string $enumType): void
     {
         $this->enumType = $enumType;
@@ -94,6 +97,9 @@ class DoctrineFieldMapping
         $this->unique = $unique;
     }
 
+    /**
+     * @param class-string|null $inherited
+     */
     public function setInherited(?string $inherited): void
     {
         $this->inherited = $inherited;
@@ -114,6 +120,9 @@ class DoctrineFieldMapping
         $this->quoted = $quoted;
     }
 
+    /**
+     * @param class-string|null $declared
+     */
     public function setDeclared(?string $declared): void
     {
         $this->declared = $declared;
@@ -124,6 +133,9 @@ class DoctrineFieldMapping
         $this->declaredField = $declaredField;
     }
 
+    /**
+     * @param array<mixed>|null $options
+     */
     public function setOptions(?array $options): void
     {
         $this->options = $options;
@@ -224,6 +236,9 @@ class DoctrineFieldMapping
         return $this->declaredField;
     }
 
+    /**
+     * @return array<mixed>|null
+     */
     public function getOptions(): ?array
     {
         return $this->options;

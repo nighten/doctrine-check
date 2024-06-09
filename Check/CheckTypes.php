@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Check;
 
-use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Nighten\DoctrineCheck\Doctrine\DoctrineFieldMapping;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
-use Nighten\DoctrineCheck\Php\PhpTypeResolver;
 use ReflectionClass;
 use Nighten\DoctrineCheck\Config\DoctrineCheckConfig;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
@@ -37,13 +36,28 @@ class CheckTypes
     {
         $allMetadata = $objectManager->getMetadataFactory()->getAllMetadata();
         $result = new Result();
+        $metadataReader = $config->getMetadataReader($objectManager);
+        if (null === $metadataReader) {
+            throw new DoctrineCheckException(
+                'Set metadata reader is required. Use ' . DoctrineCheckConfig::class
+                . '::setMetadataReader for set',
+            );
+        }
         foreach ($allMetadata as $metadata) {
-            $this->checkEntity($metadata, $config, $config->getMetadataReader($objectManager), $result);
+            if (!$metadata instanceof ClassMetadata) {
+                throw new DoctrineCheckException(
+                    'Expected instance of ' . ClassMetadata::class
+                    . ' from doctrine, but ' . $metadata::class
+                    . ' given. Need to upgrade lib for handle this situation',
+                );
+            }
+            $this->checkEntity($metadata, $config, $metadataReader, $result);
         }
         return $result;
     }
 
     /**
+     * @param ClassMetadata<object> $metadata
      * @throws DoctrineCheckException
      */
     private function checkEntity(
@@ -62,6 +76,8 @@ class CheckTypes
     }
 
     /**
+     * @param ClassMetadata<object> $metadata
+     * @param ReflectionClass<object> $reflectionClass
      * @throws DoctrineCheckException
      */
     private function checkField(
@@ -96,7 +112,7 @@ class CheckTypes
         if (!$config->hasDoctrineTypeMapping($type)) {
             $result->addMissedConfigMappingError(
                 $filedKey,
-                'Type "' . $doctrineFiledMapping->getType() . '" not found in map types '
+                'Type "' . $type . '" not found in map types '
                 . 'Add it in config by ' . DoctrineCheckConfig::class . '::addTypeMapping',
             );
             return false;

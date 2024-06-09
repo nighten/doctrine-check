@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Php;
 
-use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Nighten\DoctrineCheck\Dto\PhpType;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use ReflectionClass;

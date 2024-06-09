@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nighten\DoctrineCheck\Config;
 
 use Nighten\DoctrineCheck\Doctrine\DefaultMetadataReader;
+use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 
 class ConfigResolver
 {
@@ -19,10 +20,16 @@ class ConfigResolver
         return $config;
     }
 
+    /**
+     * @throws DoctrineCheckException
+     */
     private function setDefaults(DoctrineCheckConfig $config): void
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . 'defaults';
         $res = opendir($dir);
+        if (false === $res) {
+            throw new DoctrineCheckException('Filed open directory: "' . $dir . '"');
+        }
         while (($file = readdir($res)) !== false) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
                 $configSet = require $dir . DIRECTORY_SEPARATOR . $file;
