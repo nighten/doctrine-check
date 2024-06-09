@@ -9,14 +9,9 @@ class ResultCollection
     /** @var Result[] */
     private array $results = [];
 
-    private bool $hasErrors = false;
-
     public function addResult(Result $result): void
     {
         $this->results[] = $result;
-        if ($result->hasErrors()) {
-            $this->hasErrors = true;
-        }
     }
 
     /**
@@ -29,6 +24,38 @@ class ResultCollection
 
     public function hasErrors(): bool
     {
-        return $this->hasErrors;
+        foreach ($this->results as $result) {
+            if ($result->hasErrors()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getErrorsCount(): int
+    {
+        $count = 0;
+        foreach ($this->results as $result) {
+            $count += $result->getErrorsCount();
+        }
+        return $count;
+    }
+
+    public function getProcessedClassesCount(): int
+    {
+        $count = 0;
+        foreach ($this->results as $result) {
+            $count += $result->getProcessedClasses();
+        }
+        return $count;
+    }
+
+    public function getProcessedFieldsCount(): int
+    {
+        $count = 0;
+        foreach ($this->results as $result) {
+            $count += $result->getProcessedFields();
+        }
+        return $count;
     }
 }

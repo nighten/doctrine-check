@@ -72,6 +72,7 @@ class CheckTypes
         MetadataReaderInterface $metadataReader,
         Result $result,
     ): void {
+        $result->addProcessedField($reflectionClass->getName(), $fieldName);
         $filedKey = $metadata->getName() . ':' . $fieldName;
         $phpType = $config->getPhpTypeResolver()->resolve($fieldName, $metadata, $reflectionClass);
         if (!$phpType->isResolved()) {

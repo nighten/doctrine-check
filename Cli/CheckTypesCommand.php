@@ -41,6 +41,15 @@ class CheckTypesCommand extends Command
         foreach ($results->getResults() as $result) {
             $this->printResult($result, $output);
         }
+        $output->writeln(
+            'Processed ' . $results->getProcessedFieldsCount() . ' fields'
+            . ' in ' . $results->getProcessedClassesCount() . ' classes',
+        );
+        if ($results->hasErrors()) {
+            $output->writeln('Found ' . $results->getErrorsCount() . ' errors');
+        } else {
+            $output->writeln('No error found');
+        }
     }
 
     private function printResult(Result $result, OutputInterface $output): void

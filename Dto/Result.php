@@ -6,12 +6,26 @@ namespace Nighten\DoctrineCheck\Dto;
 
 class Result
 {
+    /** @var array<class-string, string[]> */
+    private array $processedFields = [];
+
     /** @var array{"message": string, "type": string}[] */
     private array $errors = [];
 
     public const TYPE_MISSED_CONFIG_MAPPING = 'MISSED_CONFIG_MAPPING';
     public const TYPE_WRONG_MAPPING_TYPE = 'WRONG_MAPPING_TYPE';
     public const TYPE_WRONG_NULLABLE = 'WRONG_NULLABLE';
+
+    /**
+     * @param class-string $className
+     */
+    public function addProcessedField(string $className, string $fieldName): void
+    {
+        if (!array_key_exists($className, $this->processedFields)) {
+            $this->processedFields[$className] = [];
+        }
+        $this->processedFields[$className][] = $fieldName;
+    }
 
     public function addMissedConfigMappingError(string $fieldKey, string $message): void
     {
@@ -47,5 +61,24 @@ class Result
     public function hasErrors(): bool
     {
         return count($this->errors) > 0;
+    }
+
+    public function getErrorsCount(): int
+    {
+        return count($this->errors);
+    }
+
+    public function getProcessedClasses(): int
+    {
+        return count($this->processedFields);
+    }
+
+    public function getProcessedFields(): int
+    {
+        $count = 0;
+        foreach ($this->processedFields as $fields) {
+            $count += count($fields);
+        }
+        return $count;
     }
 }
