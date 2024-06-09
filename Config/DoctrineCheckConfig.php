@@ -60,7 +60,7 @@ class DoctrineCheckConfig
         if (!array_key_exists($doctrineType, $this->typeMapping)) {
             $this->typeMapping[$doctrineType] = [];
         }
-        if (!in_array($phpType, $this->typeMapping[$doctrineType])) {
+        if (!in_array($phpType, $this->typeMapping[$doctrineType], true)) {
             $this->typeMapping[$doctrineType][] = $phpType;
         }
     }
@@ -91,6 +91,7 @@ class DoctrineCheckConfig
 
     /**
      * @return string[]
+     * @throws DoctrineCheckException
      */
     public function getTypeMapping(string $doctrineType): array
     {
@@ -118,7 +119,7 @@ class DoctrineCheckConfig
         ?ObjectManager $objectManager = null,
     ): void {
         if (null !== $objectManager) {
-            $this->objectManagerMetadataReaders[spl_object_id($objectManager)] = $objectManager;
+            $this->objectManagerMetadataReaders[spl_object_id($objectManager)] = $metadataReader;
             return;
         }
         $this->metadataReader = $metadataReader;
