@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Nighten\DoctrineCheck\Config;
 
 use Doctrine\Persistence\ObjectManager;
+use Nighten\DoctrineCheck\Console\ConsoleInputConfigurationFactoryInterface;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Php\PhpTypeResolverInterface;
+use Nighten\DoctrineCheck\Ignore\IgnoreStorage;
 
 class DoctrineCheckConfig
 {
     /** @var array<string, string[]> */
     private array $typeMapping = [];
+
+    private IgnoreStorage $ignores;
 
     /** @var array<int, ObjectManager> */
     private array $objectManagers = [];
@@ -24,7 +28,14 @@ class DoctrineCheckConfig
 
     private ?PhpTypeResolverInterface $phpTypeResolver = null;
 
+    private ?ConsoleInputConfigurationFactoryInterface $consoleInputConfigurationFactory = null;
+
     private bool $checkNullAtIdFields = true;
+
+    public function __construct()
+    {
+        $this->ignores = new IgnoreStorage();
+    }
 
     public function addObjectManager(
         ObjectManager $objectManager,
@@ -74,6 +85,19 @@ class DoctrineCheckConfig
         foreach ($phpTypes as $phpType) {
             $this->addTypeMapping($doctrineType, $phpType);
         }
+    }
+
+    public function getIgnoreStorage(): IgnoreStorage
+    {
+        return $this->ignores;
+    }
+
+    /**
+     * @param class-string $className
+     */
+    public function addIgnore(string $className, string $field, string $errorType): void
+    {
+        $this->ignores->addIgnore($className, $field, $errorType);
     }
 
     public function hasDoctrineTypeMapping(string $doctrineType): bool
@@ -154,5 +178,16 @@ class DoctrineCheckConfig
     public function setCheckNullAtIdFields(bool $checkNullAtIdFields): void
     {
         $this->checkNullAtIdFields = $checkNullAtIdFields;
+    }
+
+    public function getConsoleInputConfigurationFactory(): ?ConsoleInputConfigurationFactoryInterface
+    {
+        return $this->consoleInputConfigurationFactory;
+    }
+
+    public function setConsoleInputConfigurationFactory(
+        ConsoleInputConfigurationFactoryInterface $consoleInputConfigurationFactory
+    ): void {
+        $this->consoleInputConfigurationFactory = $consoleInputConfigurationFactory;
     }
 }

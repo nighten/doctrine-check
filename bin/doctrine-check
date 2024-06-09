@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-use Nighten\DoctrineCheck\Cli\CheckTypesCommand;
 use Nighten\DoctrineCheck\Config\ConfigResolver;
+use Nighten\DoctrineCheck\Console\Command\CheckTypesCommand;
 use Symfony\Component\Console\Application;
 
 $autoloadFile = null;

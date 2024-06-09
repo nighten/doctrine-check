@@ -6,14 +6,16 @@ namespace Nighten\DoctrineCheck\Check;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
+use Nighten\DoctrineCheck\Config\DoctrineCheckConfig;
 use Nighten\DoctrineCheck\Doctrine\DoctrineFieldMapping;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
-use ReflectionClass;
-use Nighten\DoctrineCheck\Config\DoctrineCheckConfig;
-use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Dto\PhpType;
 use Nighten\DoctrineCheck\Dto\Result;
 use Nighten\DoctrineCheck\Dto\ResultCollection;
+use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
+use Nighten\DoctrineCheck\Ignore\IgnoreStorage;
+use Nighten\DoctrineCheck\Type\ErrorType;
+use ReflectionClass;
 
 class CheckTypes
 {
@@ -23,17 +25,22 @@ class CheckTypes
     public function check(DoctrineCheckConfig $config): ResultCollection
     {
         $result = new ResultCollection();
+        $ignoreStorage = clone $config->getIgnoreStorage();
         foreach ($config->getObjectManagers() as $objectManager) {
-            $result->addResult($this->checkObjectManager($config, $objectManager));
+            $result->addResult($this->checkObjectManager($config, $objectManager, $ignoreStorage));
         }
+        $result->setIgnoreStorage($ignoreStorage);
         return $result;
     }
 
     /**
      * @throws DoctrineCheckException
      */
-    public function checkObjectManager(DoctrineCheckConfig $config, ObjectManager $objectManager): Result
-    {
+    public function checkObjectManager(
+        DoctrineCheckConfig $config,
+        ObjectManager $objectManager,
+        IgnoreStorage $ignoreStorage,
+    ): Result {
         $allMetadata = $objectManager->getMetadataFactory()->getAllMetadata();
         $result = new Result();
         $metadataReader = $config->getMetadataReader($objectManager);
@@ -51,7 +58,13 @@ class CheckTypes
                     . ' given. Need to upgrade lib for handle this situation',
                 );
             }
-            $this->checkEntity($metadata, $config, $metadataReader, $result);
+            $this->checkEntity(
+                $metadata,
+                $config,
+                $metadataReader,
+                $ignoreStorage,
+                $result,
+            );
         }
         return $result;
     }
@@ -64,6 +77,7 @@ class CheckTypes
         ClassMetadata $metadata,
         DoctrineCheckConfig $config,
         MetadataReaderInterface $metadataReader,
+        IgnoreStorage $ignoreStorage,
         Result $result,
     ): void {
         $reflectionClass = $metadata->getReflectionClass();
@@ -71,7 +85,15 @@ class CheckTypes
             throw new DoctrineCheckException('Fail while getting ReflectionClass for ' . $metadata->getName());
         }
         foreach ($metadata->getFieldNames() as $fieldName) {
-            $this->checkField($fieldName, $metadata, $reflectionClass, $config, $metadataReader, $result);
+            $this->checkField(
+                $fieldName,
+                $metadata,
+                $reflectionClass,
+                $config,
+                $metadataReader,
+                $ignoreStorage,
+                $result,
+            );
         }
     }
 
@@ -86,45 +108,80 @@ class CheckTypes
         ReflectionClass $reflectionClass,
         DoctrineCheckConfig $config,
         MetadataReaderInterface $metadataReader,
+        IgnoreStorage $ignoreStorage,
         Result $result,
     ): void {
         $result->addProcessedField($reflectionClass->getName(), $fieldName);
-        $filedKey = $metadata->getName() . ':' . $fieldName;
         $phpType = $config->getPhpTypeResolver()->resolve($fieldName, $metadata, $reflectionClass);
         if (!$phpType->isResolved()) {
             //TODO: need implement resolve all php types and cases
             return;
         }
         $doctrineFiledMapping = $metadataReader->getFieldMapping($metadata, $fieldName);
-        if (!$this->checkTypeInConfig($config, $doctrineFiledMapping->getType(), $filedKey, $result)) {
+        if (!$this->checkTypeInConfig(
+            $config,
+            $doctrineFiledMapping->getType(),
+            $metadata->getName(),
+            $fieldName,
+            $ignoreStorage,
+            $result,
+        )) {
             return;
         }
-        $this->checkType($config, $phpType, $doctrineFiledMapping, $filedKey, $result);
-        $this->checkNull($config, $phpType, $doctrineFiledMapping, $filedKey, $result);
+        $this->checkType(
+            $config,
+            $phpType,
+            $doctrineFiledMapping,
+            $metadata->getName(),
+            $fieldName,
+            $ignoreStorage,
+            $result,
+        );
+        $this->checkNull(
+            $config,
+            $phpType,
+            $doctrineFiledMapping,
+            $metadata->getName(),
+            $fieldName,
+            $ignoreStorage,
+            $result,
+        );
     }
 
+    /**
+     * @param class-string $className
+     */
     private function checkTypeInConfig(
         DoctrineCheckConfig $config,
         string $type,
-        string $filedKey,
+        string $className,
+        string $fieldName,
+        IgnoreStorage $ignoreStorage,
         Result $result,
     ): bool {
         if (!$config->hasDoctrineTypeMapping($type)) {
-            $result->addMissedConfigMappingError(
-                $filedKey,
-                'Type "' . $type . '" not found in map types '
-                . 'Add it in config by ' . DoctrineCheckConfig::class . '::addTypeMapping',
-            );
-            return false;
+            if (!$ignoreStorage->found($className, $fieldName, ErrorType::TYPE_MISSED_CONFIG_MAPPING)) {
+                $result->addMissedConfigMappingError(
+                    $className . ':' . $fieldName,
+                    'Type "' . $type . '" not found in map types '
+                    . 'Add it in config by ' . DoctrineCheckConfig::class . '::addTypeMapping',
+                );
+                return false;
+            }
         }
         return true;
     }
 
+    /**
+     * @param class-string $className
+     */
     private function checkType(
         DoctrineCheckConfig $config,
         PhpType $phpType,
         DoctrineFieldMapping $doctrineFiledMapping,
-        string $filedKey,
+        string $className,
+        string $fieldName,
+        IgnoreStorage $ignoreStorage,
         Result $result,
     ): void {
         $doctrineType = $doctrineFiledMapping->getType();
@@ -142,19 +199,26 @@ class CheckTypes
                     return;
                 }
             }
-            $result->addWrongMappingType(
-                $filedKey,
-                'Doctrine type "' . $doctrineType . '" not accepted php type(s): '
-                . implode('|', $phpTypesFactInClass),
-            );
+            if (!$ignoreStorage->found($className, $fieldName, ErrorType::TYPE_WRONG_MAPPING_TYPE)) {
+                $result->addWrongMappingType(
+                    $className . ':' . $fieldName,
+                    'Doctrine type "' . $doctrineType . '" not accepted php type(s): '
+                    . implode('|', $phpTypesFactInClass),
+                );
+            }
         }
     }
 
+    /**
+     * @param class-string $className
+     */
     private function checkNull(
         DoctrineCheckConfig $config,
         PhpType $phpType,
         DoctrineFieldMapping $doctrineFiledMapping,
-        string $filedKey,
+        string $className,
+        string $fieldName,
+        IgnoreStorage $ignoreStorage,
         Result $result,
     ): void {
         if (!$config->isCheckNullAtIdFields() && $doctrineFiledMapping->getId() === true) {
@@ -166,11 +230,14 @@ class CheckTypes
             if (null !== $inDoctrineIsNullable) {
                 $inDoctrineText = $inDoctrineIsNullable ? 'nullable' : 'not nullable';
             }
-            $result->addWrongNullble(
-                $filedKey,
-                'Doctrine type ' . $inDoctrineText . ' but in php '
-                . ($phpType->isAllowNull() ? 'allow null' : 'not allow null'),
-            );
+
+            if (!$ignoreStorage->found($className, $fieldName, ErrorType::TYPE_WRONG_NULLABLE)) {
+                $result->addWrongNullble(
+                    $className . ':' . $fieldName,
+                    'Doctrine type ' . $inDoctrineText . ' but in php '
+                    . ($phpType->isAllowNull() ? 'allow null' : 'not allow null'),
+                );
+            }
         }
     }
 }

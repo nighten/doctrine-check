@@ -5,9 +5,11 @@ parameters:
     level: 9
     paths:
         - Check/
-        - Cli/
         - Config/
+        - Console/
         - Doctrine/
         - Dto/
         - Exception/
+        - Ignore/
         - Php/
+        - Type/

@@ -54,3 +54,18 @@ return function (DoctrineCheckConfig $config): void {
     $config->addTypeMapping('uuid', UuidV7::class);
 };
 ```
+
+### Add ignores:
+
+```php
+
+use App\Entity\EntityClass;
+use Nighten\DoctrineCheck\Type;
+
+//...
+
+return function (DoctrineCheckConfig $config): void {
+    //...
+    $config->addIgnore(EntityClass::class, 'name', ErrorType::TYPE_WRONG_NULLABLE);
+};
+```
