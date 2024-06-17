@@ -44,6 +44,12 @@ class CheckTypesCommand extends Command
                 'Do not add to output ignores list.',
             )
             ->addOption(
+                'show-skipped',
+                null,
+                InputOption::VALUE_NONE,
+                'Show skipped checkes.',
+            )
+            ->addOption(
                 'do-not-fail-on-usless-ignore',
                 null,
                 InputOption::VALUE_NONE,
@@ -77,7 +83,7 @@ class CheckTypesCommand extends Command
 
         $hasErrors = $results->hasErrors();
 
-        if (!$consoleConfiguration->isDoNotFailOnUslessIgnore()) {
+        if (!$consoleConfiguration->isDoNotFailOnUselessIgnore()) {
             $resultIgnoreStorage = $results->getIgnoreStorage();
             $count = $resultIgnoreStorage->getCountIgnores();
             if ($count > 0) {
@@ -132,6 +138,24 @@ class CheckTypesCommand extends Command
             $output->writeln('Found ' . $results->getErrorsCount() . ' errors');
         } else {
             $output->writeln('No error found');
+        }
+        if ($results->hasWarnings()) {
+            $output->writeln('Found ' . $results->getWarningsCount() . ' warnings:');
+            foreach ($results->getResults() as $result) {
+                foreach ($result->getWarnings() as $warning) {
+                    $output->writeln(' ' . $warning);
+                }
+            }
+        }
+        if ($consoleConfiguration->isShowSkipped() && $results->hasSkipped()) {
+            $output->writeln($results->getSkippedCount() . ' skipped checks:');
+            foreach ($results->getResults() as $result) {
+                foreach ($result->getSkipped() as $skipped) {
+                    $output->writeln(
+                        ' ' . $skipped['class'] . ':' . $skipped['field'] . ' - ' . $skipped['reason'],
+                    );
+                }
+            }
         }
     }
 

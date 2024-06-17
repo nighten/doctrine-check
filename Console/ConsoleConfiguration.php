@@ -7,7 +7,8 @@ namespace Nighten\DoctrineCheck\Console;
 class ConsoleConfiguration
 {
     private bool $hideIgnores = false;
-    private bool $doNotFailOnUslessIgnore = false;
+    private bool $doNotFailOnUselessIgnore = false;
+    private bool $showSkipped = false;
 
     public function isHideIgnores(): bool
     {
@@ -19,13 +20,23 @@ class ConsoleConfiguration
         $this->hideIgnores = $hideIgnores;
     }
 
-    public function isDoNotFailOnUslessIgnore(): bool
+    public function isDoNotFailOnUselessIgnore(): bool
     {
-        return $this->doNotFailOnUslessIgnore;
+        return $this->doNotFailOnUselessIgnore;
     }
 
-    public function setDoNotFailOnUslessIgnore(bool $doNotFailOnUslessIgnore): void
+    public function setDoNotFailOnUselessIgnore(bool $doNotFailOnUselessIgnore): void
     {
-        $this->doNotFailOnUslessIgnore = $doNotFailOnUslessIgnore;
+        $this->doNotFailOnUselessIgnore = $doNotFailOnUselessIgnore;
+    }
+
+    public function isShowSkipped(): bool
+    {
+        return $this->showSkipped;
+    }
+
+    public function setShowSkipped(bool $showSkipped): void
+    {
+        $this->showSkipped = $showSkipped;
     }
 }

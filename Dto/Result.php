@@ -11,6 +11,12 @@ class Result
     /** @var array<class-string, string[]> */
     private array $processedFields = [];
 
+    /** @var array{"class": string, "field": string, "reason": string}[] */
+    private array $skipped = [];
+
+    /** @var string[] */
+    private array $warnings = [];
+
     /** @var array{"message": string, "type": string}[] */
     private array $errors = [];
 
@@ -35,7 +41,7 @@ class Result
         $this->addError($fieldKey, $message, ErrorType::TYPE_WRONG_MAPPING_TYPE);
     }
 
-    public function addWrongNullble(string $fieldKey, string $message): void
+    public function addWrongNullable(string $fieldKey, string $message): void
     {
         $this->addError($fieldKey, $message, ErrorType::TYPE_WRONG_NULLABLE);
     }
@@ -64,6 +70,56 @@ class Result
     public function getErrorsCount(): int
     {
         return count($this->errors);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getWarnings(): array
+    {
+        return $this->warnings;
+    }
+
+    public function addWarning(string $message): void
+    {
+        $this->warnings[$message] = $message;
+    }
+
+    public function hasWarnings(): bool
+    {
+        return count($this->warnings) > 0;
+    }
+
+    public function getWarningsCount(): int
+    {
+        return count($this->warnings);
+    }
+
+    /**
+     * @return array{"class": string, "field": string, "reason": string}[]
+     */
+    public function getSkipped(): array
+    {
+        return $this->skipped;
+    }
+
+    public function addSkipped(string $className, string $field, string $reason): void
+    {
+        $this->skipped[] = [
+            'class' => $className,
+            'field' => $field,
+            'reason' => $reason,
+        ];
+    }
+
+    public function hasSkipped(): bool
+    {
+        return count($this->skipped) > 0;
+    }
+
+    public function getSkippedCount(): int
+    {
+        return count($this->skipped);
     }
 
     public function getProcessedClasses(): int
