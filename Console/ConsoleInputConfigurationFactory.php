@@ -16,10 +16,14 @@ class ConsoleInputConfigurationFactory implements ConsoleInputConfigurationFacto
         $doNotFailOnUslessIgnore = $input->hasOption('do-not-fail-on-usless-ignore')
             ? (bool)$input->getOption('do-not-fail-on-usless-ignore')
             : false;
+        $showSkipped = $input->hasOption('show-skipped')
+            ? (bool)$input->getOption('show-skipped')
+            : false;
 
         $configurator = new ConsoleConfiguration();
         $configurator->setHideIgnores($hideIgnores);
-        $configurator->setDoNotFailOnUslessIgnore($doNotFailOnUslessIgnore);
+        $configurator->setDoNotFailOnUselessIgnore($doNotFailOnUslessIgnore);
+        $configurator->setShowSkipped($showSkipped);
         return $configurator;
     }
 }

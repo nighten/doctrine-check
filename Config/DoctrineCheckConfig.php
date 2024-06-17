@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Nighten\DoctrineCheck\Config;
 
 use Doctrine\Persistence\ObjectManager;
+use Nighten\DoctrineCheck\Check\Contract\AssociationMappingCheckerInterface;
+use Nighten\DoctrineCheck\Check\Contract\FieldMappingCheckerInterface;
 use Nighten\DoctrineCheck\Console\ConsoleInputConfigurationFactoryInterface;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
@@ -27,6 +29,10 @@ class DoctrineCheckConfig
     private ?MetadataReaderInterface $metadataReader = null;
 
     private ?PhpTypeResolverInterface $phpTypeResolver = null;
+
+    private ?FieldMappingCheckerInterface $fieldMappingChecker = null;
+
+    private ?AssociationMappingCheckerInterface $associationMappingChecker = null;
 
     private ?ConsoleInputConfigurationFactoryInterface $consoleInputConfigurationFactory = null;
 
@@ -173,6 +179,26 @@ class DoctrineCheckConfig
     public function isCheckNullAtIdFields(): bool
     {
         return $this->checkNullAtIdFields;
+    }
+
+    public function getFieldMappingChecker(): ?FieldMappingCheckerInterface
+    {
+        return $this->fieldMappingChecker;
+    }
+
+    public function setFieldMappingChecker(?FieldMappingCheckerInterface $fieldMappingChecker): void
+    {
+        $this->fieldMappingChecker = $fieldMappingChecker;
+    }
+
+    public function getAssociationMappingChecker(): ?AssociationMappingCheckerInterface
+    {
+        return $this->associationMappingChecker;
+    }
+
+    public function setAssociationMappingChecker(?AssociationMappingCheckerInterface $associationMappingChecker): void
+    {
+        $this->associationMappingChecker = $associationMappingChecker;
     }
 
     public function setCheckNullAtIdFields(bool $checkNullAtIdFields): void

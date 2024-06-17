@@ -15,6 +15,8 @@ class PhpType
 
     private bool $allowNull;
 
+    private string $comment = '';
+
     public function isResolved(): bool
     {
         return $this->resolved;
@@ -51,5 +53,15 @@ class PhpType
         $this->typeNames = $typeNames;
         $this->allowNull = $allowNull;
         $this->resolved = true;
+    }
+
+    public function getComment(): string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(string $comment): void
+    {
+        $this->comment = $comment;
     }
 }

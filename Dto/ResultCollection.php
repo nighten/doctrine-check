@@ -50,6 +50,44 @@ class ResultCollection
         return $count;
     }
 
+    public function hasWarnings(): bool
+    {
+        foreach ($this->results as $result) {
+            if ($result->hasWarnings()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getWarningsCount(): int
+    {
+        $count = 0;
+        foreach ($this->results as $result) {
+            $count += $result->getWarningsCount();
+        }
+        return $count;
+    }
+
+    public function hasSkipped(): bool
+    {
+        foreach ($this->results as $result) {
+            if ($result->hasSkipped()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getSkippedCount(): int
+    {
+        $count = 0;
+        foreach ($this->results as $result) {
+            $count += $result->getSkippedCount();
+        }
+        return $count;
+    }
+
     public function getProcessedClassesCount(): int
     {
         $count = 0;
