@@ -1,6 +1,6 @@
 # Doctrine check
 
-Tool for check doctrine entity field mapping with php types. Beta version. Check only basic types.
+Tool for check doctrine entity field mapping with php types.
 
 ## Install
 
@@ -35,9 +35,38 @@ Then run check:
 vendor/bin/doctrine-check types
 ```
 
+## The list of checks:
+
+- Simple types such as int, string, bool, datetime and so on. Check match type and nullable
+
+Example:
+```php
+#[ORM\Column(type: 'string', nullable: true)]
+private ?string $code;
+
+#[ORM\Column(type: 'integer', nullable: false, enumType: Type::class)]
+private Type $type;
+
+#[ORM\Column(type: 'boolean', nullable: false)]
+private bool $deleted = false;
+
+#[ORM\Column(type: 'datetime_immutable', nullable: true)]
+private ?DateTimeImmutable $updatedAt = null;
+```
+- Association mapping ManyToOne:
+
+Example:
+```php
+#[
+    ORM\ManyToOne(targetEntity: User::class),
+    ORM\JoinColumn(nullable: false),
+]
+private User $user;
+```
+
 ## Configuration
 
-### Add new type mappings:
+### Add additional type mappings:
 
 ```php
 
