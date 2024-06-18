@@ -13,8 +13,8 @@ class ConsoleInputConfigurationFactory implements ConsoleInputConfigurationFacto
         $hideIgnores = $input->hasOption('hide-ignores')
             ? (bool)$input->getOption('hide-ignores')
             : false;
-        $doNotFailOnUslessIgnore = $input->hasOption('do-not-fail-on-usless-ignore')
-            ? (bool)$input->getOption('do-not-fail-on-usless-ignore')
+        $doNotFailOnUslessIgnore = $input->hasOption('do-not-fail-on-useless-ignore')
+            ? (bool)$input->getOption('do-not-fail-on-useless-ignore')
             : false;
         $showSkipped = $input->hasOption('show-skipped')
             ? (bool)$input->getOption('show-skipped')

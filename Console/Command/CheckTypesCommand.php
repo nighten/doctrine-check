@@ -50,7 +50,7 @@ class CheckTypesCommand extends Command
                 'Show skipped checkes.',
             )
             ->addOption(
-                'do-not-fail-on-usless-ignore',
+                'do-not-fail-on-useless-ignore',
                 null,
                 InputOption::VALUE_NONE,
                 'Do not return error code when exsit ingnore which not found in errors.',
@@ -87,7 +87,7 @@ class CheckTypesCommand extends Command
             $resultIgnoreStorage = $results->getIgnoreStorage();
             $count = $resultIgnoreStorage->getCountIgnores();
             if ($count > 0) {
-                $output->writeln('Fail: Found ' . $count . ' usless ignore(s)');
+                $output->writeln('Fail: Found ' . $count . ' useless ignore(s)');
                 $hasErrors = true;
             }
         }
@@ -121,7 +121,7 @@ class CheckTypesCommand extends Command
 
                 $resultIgnoreStorage = $results->getIgnoreStorage();
                 if ($resultIgnoreStorage->getCountIgnores() > 0) {
-                    $output->writeln('Found usless ignore(s):');
+                    $output->writeln('Found useless ignore(s):');
                     foreach ($resultIgnoreStorage->getIgnores() as $ignore => $true) {
                         $output->writeln(' ' . $ignore);
                     }
