@@ -32,11 +32,11 @@
     },
     "exclude-from-classmap": [
       "/Tests/"
-    ],
-    "autoload-dev": {
-      "psr-4": {
-        "Nighten\\Tests\\": "Tests/"
-      }
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Nighten\\Tests\\": "Tests/"
     }
   },
   "minimum-stability": "dev"
