@@ -50,6 +50,18 @@ class ResultCollection
         return $count;
     }
 
+    /**
+     * @return array{"message": string, "type": string}[]
+     */
+    public function getAllErrors(): array
+    {
+        $errors = [];
+        foreach ($this->results as $result) {
+            $errors[] = $result->getErrors();
+        }
+        return array_merge(...$errors);
+    }
+
     public function hasWarnings(): bool
     {
         foreach ($this->results as $result) {

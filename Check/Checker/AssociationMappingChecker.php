@@ -37,7 +37,7 @@ class AssociationMappingChecker implements AssociationMappingCheckerInterface
             $result->addSkipped(
                 $className,
                 $fieldName,
-                'Handle association mapping "' . $associationMapping::class . '" is not implemended yet',
+                'Handle association mapping "' . $associationMapping::class . '" is not implemented yet',
             );
             return;
         }

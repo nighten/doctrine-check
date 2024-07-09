@@ -46,6 +46,8 @@ class CheckTypes
                 . '::setMetadataReader for set',
             );
         }
+        $hasEntityClasses = $config->hasEntityClasses();
+        $hasExcludedEntityClasses = $config->hasExcludedEntityClasses();
         foreach ($allMetadata as $metadata) {
             if (!$metadata instanceof ClassMetadata) {
                 throw new DoctrineCheckException(
@@ -54,13 +56,22 @@ class CheckTypes
                     . ' given. Need to upgrade lib for handle this situation',
                 );
             }
-            $this->checkEntity(
-                $metadata,
-                $config,
-                $metadataReader,
-                $ignoreStorage,
-                $result,
-            );
+            $check = true;
+            if ($hasEntityClasses && !$config->existEntityClasses($metadata->getName())) {
+                $check = false;
+            }
+            if ($hasExcludedEntityClasses && $config->existExcludedEntityClasses($metadata->getName())) {
+                $check = false;
+            }
+            if ($check) {
+                $this->checkEntity(
+                    $metadata,
+                    $config,
+                    $metadataReader,
+                    $ignoreStorage,
+                    $result,
+                );
+            }
         }
         return $result;
     }

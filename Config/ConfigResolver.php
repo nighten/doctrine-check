@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Config;
 
+use Closure;
 use Nighten\DoctrineCheck\Doctrine\DefaultMetadataReader;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 
 class ConfigResolver
 {
-    public function resolve(string $fileName = 'doctrine-check-config.php'): DoctrineCheckConfig
+    /**
+     * @throws DoctrineCheckException
+     */
+    public function resolve(string | Closure $userConfiguration = 'doctrine-check-config.php'): DoctrineCheckConfig
     {
         $config = new DoctrineCheckConfig();
         $this->setDefaults($config);
-        $configFileName = getcwd() . DIRECTORY_SEPARATOR . $fileName;
-        $userConfig = require $configFileName;
+        if (is_string($userConfiguration)) {
+            $configFileName = getcwd() . DIRECTORY_SEPARATOR . $userConfiguration;
+            $userConfig = require $configFileName;
+        } else {
+            $userConfig = $userConfiguration;
+        }
         $userConfig($config);
         $this->setMetadataReader($config);
         return $config;

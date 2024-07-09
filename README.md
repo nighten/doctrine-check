@@ -8,11 +8,12 @@ Tool for check doctrine entity field mapping with php types.
 composer require nighten/doctrine-check --dev
 ```
 
-## Running 
+## Running
 
 Create a `doctrine-check-config.php` in your root directory and modify:
 
 Need to add doctrine object manager to config. Example for Symfony project:
+
 ```php
 use App\Kernel;
 use Nighten\DoctrineCheck\Config\DoctrineCheckConfig;
@@ -40,6 +41,7 @@ vendor/bin/doctrine-check types
 - Simple types such as int, string, bool, datetime and so on. Check match type and nullable
 
 Example:
+
 ```php
 #[ORM\Column(type: 'string', nullable: true)]
 private ?string $code;
@@ -53,9 +55,11 @@ private bool $deleted = false;
 #[ORM\Column(type: 'datetime_immutable', nullable: true)]
 private ?DateTimeImmutable $updatedAt = null;
 ```
+
 - Association mapping ManyToOne:
 
 Example:
+
 ```php
 #[
     ORM\ManyToOne(targetEntity: User::class),
@@ -84,7 +88,43 @@ return function (DoctrineCheckConfig $config): void {
 };
 ```
 
-### Add ignores:
+### Add specific entity classes:
+
+The checker will check only the specified classes
+
+```php
+
+use App\Entity\EntityClass;
+use Nighten\DoctrineCheck\Type;
+
+//...
+
+return function (DoctrineCheckConfig $config): void {
+    //...
+    $config->addEntityClass(EntityClass::class);
+};
+```
+
+### Ignore some entity classes:
+
+The checker will check all classes except those specified
+
+```php
+
+use App\Entity\EntityClass;
+use Nighten\DoctrineCheck\Type;
+
+//...
+
+return function (DoctrineCheckConfig $config): void {
+    //...
+    $config->addExcludedEntityClasses(EntityClass::class);
+};
+```
+
+### Add error ignores:
+
+The checker will skip the specified errors
 
 ```php
 

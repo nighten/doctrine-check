@@ -26,6 +26,12 @@ class DoctrineCheckConfig
     /** @var array<int, MetadataReaderInterface> */
     private array $objectManagerMetadataReaders = [];
 
+    /** @var array<class-string, class-string> */
+    private array $entityClasses = [];
+
+    /** @var array<class-string, class-string> */
+    private array $excludedEntityClasses = [];
+
     private ?MetadataReaderInterface $metadataReader = null;
 
     private ?PhpTypeResolverInterface $phpTypeResolver = null;
@@ -215,5 +221,57 @@ class DoctrineCheckConfig
         ConsoleInputConfigurationFactoryInterface $consoleInputConfigurationFactory
     ): void {
         $this->consoleInputConfigurationFactory = $consoleInputConfigurationFactory;
+    }
+
+    /**
+     * @return array<class-string, class-string>
+     */
+    public function getEntityClasses(): array
+    {
+        return $this->entityClasses;
+    }
+
+    /**
+     * @param class-string $entityClass
+     */
+    public function addEntityClass(string $entityClass): void
+    {
+        $this->entityClasses[$entityClass] = $entityClass;
+    }
+
+    public function hasEntityClasses(): bool
+    {
+        return count($this->entityClasses) > 0;
+    }
+
+    public function existEntityClasses(string $entityClass): bool
+    {
+        return array_key_exists($entityClass, $this->entityClasses);
+    }
+
+    /**
+     * @return array<class-string, class-string>
+     */
+    public function getExcludedEntityClasses(): array
+    {
+        return $this->excludedEntityClasses;
+    }
+
+    /**
+     * @param class-string $entityClass
+     */
+    public function addExcludedEntityClasses(string $entityClass): void
+    {
+        $this->excludedEntityClasses[$entityClass] = $entityClass;
+    }
+
+    public function hasExcludedEntityClasses(): bool
+    {
+        return count($this->entityClasses) > 0;
+    }
+
+    public function existExcludedEntityClasses(string $entityClass): bool
+    {
+        return array_key_exists($entityClass, $this->excludedEntityClasses);
     }
 }
