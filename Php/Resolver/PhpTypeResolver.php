@@ -2,17 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Nighten\DoctrineCheck\Php;
+namespace Nighten\DoctrineCheck\Php\Resolver;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Nighten\DoctrineCheck\Dto\PhpType;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
+use Nighten\DoctrineCheck\Php\PHPDocParser\PHPDocParserInterface;
 use ReflectionClass;
 use ReflectionNamedType;
+use ReflectionProperty;
+use ReflectionType;
 use ReflectionUnionType;
 
 class PhpTypeResolver implements PhpTypeResolverInterface
 {
+    public function __construct(
+        private readonly PHPDocParserInterface $PHPDocParser,
+    ) {
+    }
+
     /**
      * @throws DoctrineCheckException
      */
@@ -43,10 +51,38 @@ class PhpTypeResolver implements PhpTypeResolverInterface
         $prop = $reflectionClass->getProperty($fieldName);
         $type = $prop->getType();
         if (null === $type) {
-            //TODO: implement that logic (property without type)
-            $result->setComment('Handle property without type is not implemented yet.');
+            $this->resolveFromPHPDoc($prop, $result);
             return $result;
         }
+
+        $this->resolveFromPHP($type, $result);
+        return $result;
+    }
+
+    private function resolveFromPHPDoc(ReflectionProperty $prop, PhpType $result): void
+    {
+        $docComment = $prop->getDocComment();
+        if (false === $docComment) {
+            //TODO: implement that logic (property without type)
+            $result->setComment('Handle property without type is not implemented yet.');
+            return;
+        }
+        $phpDoc = $this->PHPDocParser->parse($docComment);
+        $phpDocTypes = $phpDoc->getTypes();
+        if ([] === $phpDocTypes) {
+            //TODO: implement that logic (property without type)
+            $result->setComment('Handle property without type is not implemented yet.');
+            return;
+        }
+
+        $result->resolve($phpDoc->getTypes(), $phpDoc->isAllowNull());
+    }
+
+    /**
+     * @throws DoctrineCheckException
+     */
+    private function resolveFromPHP(ReflectionType $type, PhpType $result): void
+    {
         $phpTypeNames = [];
         if ($type instanceof ReflectionNamedType) {
             $phpTypeNames[] = $type->getName();
@@ -69,6 +105,5 @@ class PhpTypeResolver implements PhpTypeResolverInterface
             );
         }
         $result->resolve($phpTypeNames, $phpTypeIsAllowsNull);
-        return $result;
     }
 }

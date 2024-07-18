@@ -22,8 +22,8 @@ class EntitySimpleType
     #[ORM\Column(type: 'bigint', nullable: false)]
     private string $bigint;
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private string $string;
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $string;
 
     #[ORM\Column(type: 'text', nullable: false)]
     private string $text;

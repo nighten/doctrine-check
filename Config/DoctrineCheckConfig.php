@@ -10,8 +10,8 @@ use Nighten\DoctrineCheck\Check\Contract\FieldMappingCheckerInterface;
 use Nighten\DoctrineCheck\Console\ConsoleInputConfigurationFactoryInterface;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
-use Nighten\DoctrineCheck\Php\PhpTypeResolverInterface;
 use Nighten\DoctrineCheck\Ignore\IgnoreStorage;
+use Nighten\DoctrineCheck\Php\Resolver\PhpTypeResolverInterface;
 
 class DoctrineCheckConfig
 {

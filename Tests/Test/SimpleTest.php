@@ -10,16 +10,28 @@ use Entity\EntitySimpleWithTypeErrors;
 use Nighten\DoctrineCheck\Check\CheckTypes;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Tests\BaseTestCase;
+use Nighten\DoctrineCheck\Tests\Entity\EntitySimpleTypeWithPHPDoc;
 
 class SimpleTest extends BaseTestCase
 {
     /**
      * @throws DoctrineCheckException
      */
-    public function testPositive(): void
+    public function testPositiveWithPHPTypes(): void
     {
         $config = $this->getConfig();
         $config->addEntityClass(EntitySimpleType::class);
+        $result = (new CheckTypes())->check($config);
+        $this->assertFalse($result->hasErrors());
+    }
+
+    /**
+     * @throws DoctrineCheckException
+     */
+    public function testPositiveWithPHPDocTypes(): void
+    {
+        $config = $this->getConfig();
+        $config->addEntityClass(EntitySimpleTypeWithPHPDoc::class);
         $result = (new CheckTypes())->check($config);
         $this->assertFalse($result->hasErrors());
     }

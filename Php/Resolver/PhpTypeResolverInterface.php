@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nighten\DoctrineCheck\Php;
+namespace Nighten\DoctrineCheck\Php\Resolver;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Nighten\DoctrineCheck\Dto\PhpType;
