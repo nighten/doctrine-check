@@ -61,6 +61,21 @@ class AssociationMappingChecker implements AssociationMappingCheckerInterface
         }
         $phpTypeClassName = $phpTypeNames[array_key_first($phpTypeNames)];
 
+        if ($phpType->isResolveSourcePhpDoc()) {
+            if (str_starts_with($phpTypeClassName, '\\')) {
+                $phpTypeClassName = substr($phpTypeClassName, 1);
+            } elseif (!class_exists($phpTypeClassName)) {
+                //TODO: Add handle short PHPDoc class. Loaded from use
+                $result->addSkipped(
+                    $className,
+                    $fieldName,
+                    'Handle short class (loaded from use) from PHPDoc "' . $phpTypeClassName
+                    . '" is not implemented yet',
+                );
+                return;
+            }
+        }
+
         if ($phpTypeClassName !== $targetEntityClassName) {
             if (!$ignoreStorage->found($className, $fieldName, ErrorType::TYPE_WRONG_MAPPING_TYPE)) {
                 $result->addWrongMappingType(
@@ -83,7 +98,7 @@ class AssociationMappingChecker implements AssociationMappingCheckerInterface
             $result->addSkipped(
                 $className,
                 $fieldName,
-                'Handle not not join columns "' . implode('|', $texts)
+                'Handle not one join columns "' . implode('|', $texts)
                 . '" is not implemented yet',
             );
             return;

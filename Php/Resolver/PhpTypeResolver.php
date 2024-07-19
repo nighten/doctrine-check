@@ -75,7 +75,11 @@ class PhpTypeResolver implements PhpTypeResolverInterface
             return;
         }
 
-        $result->resolve($phpDoc->getTypes(), $phpDoc->isAllowNull());
+        $result->resolve(
+            $phpDoc->getTypes(),
+            $phpDoc->isAllowNull(),
+            ResolveSource::PHPDoc,
+        );
     }
 
     /**
@@ -104,6 +108,10 @@ class PhpTypeResolver implements PhpTypeResolverInterface
                 . ' Context: $type is "' . $type::class . '"'
             );
         }
-        $result->resolve($phpTypeNames, $phpTypeIsAllowsNull);
+        $result->resolve(
+            $phpTypeNames,
+            $phpTypeIsAllowsNull,
+            ResolveSource::PHPNative,
+        );
     }
 }

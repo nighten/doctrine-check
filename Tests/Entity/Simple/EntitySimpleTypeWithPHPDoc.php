@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nighten\DoctrineCheck\Tests\Entity;
+namespace Nighten\DoctrineCheck\Tests\Entity\Simple;
 
 use DateTime;
 use DateTimeImmutable;

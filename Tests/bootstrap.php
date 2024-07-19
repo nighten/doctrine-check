@@ -8,7 +8,11 @@ use Nighten\DoctrineCheck\Tests\Config\NullCache;
 require_once 'vendor/autoload.php';
 
 $doctrineConfig = ORMSetup::createAttributeMetadataConfiguration(
-    paths: array(__DIR__ . '/Entity'),
+    paths: [
+        __DIR__ . '/Entity/ManyToOne',
+        __DIR__ . '/Entity/Related',
+        __DIR__ . '/Entity/Simple',
+    ],
     isDevMode: true,
     cache: new NullCache(),
 );

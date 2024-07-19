@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nighten\DoctrineCheck\Dto;
 
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
+use Nighten\DoctrineCheck\Php\Resolver\ResolveSource;
 
 class PhpType
 {
@@ -14,6 +15,8 @@ class PhpType
     private array $typeNames;
 
     private bool $allowNull;
+
+    private ResolveSource $resolveSource;
 
     private string $comment = '';
 
@@ -48,10 +51,14 @@ class PhpType
     /**
      * @param string[] $typeNames
      */
-    public function resolve(array $typeNames, bool $allowNull): void
-    {
+    public function resolve(
+        array $typeNames,
+        bool $allowNull,
+        ResolveSource $resolveSource,
+    ): void {
         $this->typeNames = $typeNames;
         $this->allowNull = $allowNull;
+        $this->resolveSource = $resolveSource;
         $this->resolved = true;
     }
 
@@ -63,5 +70,15 @@ class PhpType
     public function setComment(string $comment): void
     {
         $this->comment = $comment;
+    }
+
+    public function isResolveSourcePhpNative(): bool
+    {
+        return $this->resolveSource === ResolveSource::PHPNative;
+    }
+
+    public function isResolveSourcePhpDoc(): bool
+    {
+        return $this->resolveSource === ResolveSource::PHPDoc;
     }
 }

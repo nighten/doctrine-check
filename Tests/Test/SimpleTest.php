@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Tests\Test;
 
-use Entity\EntitySimpleType;
-use Entity\EntitySimpleWithNullErrors;
-use Entity\EntitySimpleWithTypeErrors;
 use Nighten\DoctrineCheck\Check\CheckTypes;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Tests\BaseTestCase;
-use Nighten\DoctrineCheck\Tests\Entity\EntitySimpleTypeWithPHPDoc;
+use Nighten\DoctrineCheck\Tests\Entity\Simple\EntitySimpleType;
+use Nighten\DoctrineCheck\Tests\Entity\Simple\EntitySimpleTypeWithPHPDoc;
+use Nighten\DoctrineCheck\Tests\Entity\Simple\EntitySimpleWithNullErrors;
+use Nighten\DoctrineCheck\Tests\Entity\Simple\EntitySimpleWithTypeErrors;
 
 class SimpleTest extends BaseTestCase
 {
@@ -22,7 +22,9 @@ class SimpleTest extends BaseTestCase
         $config = $this->getConfig();
         $config->addEntityClass(EntitySimpleType::class);
         $result = (new CheckTypes())->check($config);
-        $this->assertFalse($result->hasErrors());
+        $this->assertEquals(17, $result->getProcessedFieldsCount(), 'check ProcessedFieldsCount');
+        $this->assertEquals(0, $result->getSkippedCount(), 'check SkippedCount');
+        $this->assertFalse($result->hasErrors(), 'check errors');
     }
 
     /**
@@ -33,7 +35,9 @@ class SimpleTest extends BaseTestCase
         $config = $this->getConfig();
         $config->addEntityClass(EntitySimpleTypeWithPHPDoc::class);
         $result = (new CheckTypes())->check($config);
-        $this->assertFalse($result->hasErrors());
+        $this->assertEquals(17, $result->getProcessedFieldsCount(), 'check ProcessedFieldsCount');
+        $this->assertEquals(0, $result->getSkippedCount(), 'check SkippedCount');
+        $this->assertFalse($result->hasErrors(), 'check errors');
     }
 
     /**
@@ -115,8 +119,10 @@ class SimpleTest extends BaseTestCase
         $config = $this->getConfig();
         $config->addEntityClass(EntitySimpleWithTypeErrors::class);
         $results = (new CheckTypes())->check($config);
-        $this->assertTrue($results->hasErrors());
-        $this->assertEquals($errors, $results->getAllErrors());
+        $this->assertEquals(17, $results->getProcessedFieldsCount(), 'check ProcessedFieldsCount');
+        $this->assertEquals(0, $results->getSkippedCount(), 'check SkippedCount');
+        $this->assertTrue($results->hasErrors(), 'check errors');
+        $this->assertEquals($errors, $results->getAllErrors(), 'check errors titles');
     }
 
     /**
@@ -190,7 +196,9 @@ class SimpleTest extends BaseTestCase
         $config = $this->getConfig();
         $config->addEntityClass(EntitySimpleWithNullErrors::class);
         $results = (new CheckTypes())->check($config);
-        $this->assertTrue($results->hasErrors());
-        $this->assertEquals($errors, $results->getAllErrors());
+        $this->assertEquals(17, $results->getProcessedFieldsCount(), 'check ProcessedFieldsCount');
+        $this->assertEquals(0, $results->getSkippedCount(), 'check SkippedCount');
+        $this->assertTrue($results->hasErrors(), 'check errors');
+        $this->assertEquals($errors, $results->getAllErrors(), 'check errors titles');
     }
 }
