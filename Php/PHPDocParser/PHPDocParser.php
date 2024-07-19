@@ -33,7 +33,7 @@ class PHPDocParser implements PHPDocParserInterface
         return $result;
     }
 
-    public function compileTypes(TypeNode $type, PHPDoc $PHPDoc): void
+    private function compileTypes(TypeNode $type, PHPDoc $PHPDoc): void
     {
         if ($type instanceof IdentifierTypeNode) {
             $PHPDoc->addType($type->name);
