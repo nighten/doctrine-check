@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Php\Resolver;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Nighten\DoctrineCheck\Dto\PhpType;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Php\PHPDocParser\PHPDocParserInterface;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionType;
@@ -22,24 +22,27 @@ class PhpTypeResolver implements PhpTypeResolverInterface
     }
 
     /**
+     *
      * @throws DoctrineCheckException
+     * @throws ReflectionException
      */
     public function resolve(
+        string | ReflectionClass $class,
         string $fieldName,
-        ClassMetadata $metadata,
-        ReflectionClass $reflectionClass,
+        //TODO: probably need remove from this method
+        array $metadataParentClasses,
     ): PhpType {
-        $result = new PhpType();
-        if (str_contains($fieldName, '.')) {
-            //TODO: implement that logic (embedded)
-            $result->setComment('Handle embedded is not implemented yet');
-            return $result;
+        if (is_string($class)) {
+            $reflectionClass = new ReflectionClass($class);
+        } else {
+            $reflectionClass = $class;
         }
-        if (!$reflectionClass->hasProperty($fieldName) && count($metadata->parentClasses) > 0) {
+        $result = new PhpType();
+        if (!$reflectionClass->hasProperty($fieldName) && count($metadataParentClasses) > 0) {
             //TODO: implement that logic (inheritance)
             $result->setComment(
                 'Handle inheritance is not implemented yet. Parent classes: '
-                . implode('|', $metadata->parentClasses)
+                . implode('|', $metadataParentClasses)
             );
             return $result;
         }

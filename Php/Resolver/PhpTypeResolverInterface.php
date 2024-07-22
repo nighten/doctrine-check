@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Php\Resolver;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Nighten\DoctrineCheck\Dto\PhpType;
 use ReflectionClass;
 
 interface PhpTypeResolverInterface
 {
     /**
-     * @param ClassMetadata<object> $metadata
-     * @param ReflectionClass<object> $reflectionClass
+     * @param class-string|ReflectionClass<object> $class
+     * @param class-string[] $metadataParentClasses
      */
-    public function resolve(string $fieldName, ClassMetadata $metadata, ReflectionClass $reflectionClass): PhpType;
+    public function resolve(string | ReflectionClass $class, string $fieldName, array $metadataParentClasses): PhpType;
 }

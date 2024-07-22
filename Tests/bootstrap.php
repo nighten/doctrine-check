@@ -9,6 +9,7 @@ require_once 'vendor/autoload.php';
 
 $doctrineConfig = ORMSetup::createAttributeMetadataConfiguration(
     paths: [
+        __DIR__ . '/Entity/Embeddable',
         __DIR__ . '/Entity/ManyToOne',
         __DIR__ . '/Entity/Related',
         __DIR__ . '/Entity/Simple',

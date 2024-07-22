@@ -12,4 +12,9 @@ interface MetadataReaderInterface
      * @param ClassMetadata<object> $metadata
      */
     public function getFieldMapping(ClassMetadata $metadata, string $fieldName): DoctrineFieldMapping;
+
+    /**
+     * @param ClassMetadata<object> $metadata
+     */
+    public function getEmbeddedMapping(ClassMetadata $metadata, string $fieldName): DoctrineEmbeddedMapping;
 }

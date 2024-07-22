@@ -38,7 +38,7 @@ vendor/bin/doctrine-check types
 
 ## The list of checks:
 
-- Simple types such as int, string, bool, datetime and so on. Check match type and nullable
+#### Simple types such as int, string, bool, datetime and so on. Check match type and nullable
 
 Example:
 
@@ -56,7 +56,7 @@ private bool $deleted = false;
 private ?DateTimeImmutable $updatedAt = null;
 ```
 
-- Association mapping ManyToOne:
+#### Association mapping ManyToOne:
 
 Example:
 
@@ -66,6 +66,30 @@ Example:
     ORM\JoinColumn(nullable: false),
 ]
 private User $user;
+```
+
+#### Embedded mapping:
+
+  Types and nulls in the embeddable class are checked.
+
+  Types and null are checked in the main class
+
+Example:
+
+```php
+#[Embeddable]
+class Address
+{
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $code;
+}
+
+class User
+{
+    #[Embedded(class: Address::class)]
+    private Address $address;
+    ...
+}
 ```
 
 ## Configuration

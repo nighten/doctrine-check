@@ -4,7 +4,10 @@
   "description": "Provides check for doctrine type mapping",
   "keywords": [
     "debug",
-    "doctrine"
+    "doctrine",
+    "static analysis",
+    "dev",
+    "inspection"
   ],
   "license": "MIT",
   "authors": [
