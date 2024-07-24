@@ -42,7 +42,11 @@ class AssociationMappingChecker implements AssociationMappingCheckerInterface
             return;
         }
         $result->addProcessedField($reflectionClass->getName(), $fieldName);
-        $phpType = $config->getPhpTypeResolver()->resolve($fieldName, $metadata, $reflectionClass);
+        $phpType = $config->getPhpTypeResolver()->resolve(
+            $reflectionClass,
+            $fieldName,
+            $metadata->parentClasses,
+        );
 
         $targetEntityClassName = $associationMapping->targetEntity;
 

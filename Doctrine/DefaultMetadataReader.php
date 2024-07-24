@@ -101,4 +101,17 @@ class DefaultMetadataReader implements MetadataReaderInterface
         }
         return $mapping;
     }
+
+    public function getEmbeddedMapping(ClassMetadata $metadata, string $fieldName): DoctrineEmbeddedMapping
+    {
+        $mapping = $metadata->embeddedClasses[$fieldName];
+        $result = new DoctrineEmbeddedMapping($mapping->class);
+        $result->setColumnPrefix($mapping->columnPrefix);
+        $result->setDeclaredField($mapping->declaredField);
+        $result->setOriginalField($mapping->originalField);
+        $result->setInherited($mapping->inherited);
+        $result->setDeclared($mapping->declared);
+
+        return $result;
+    }
 }

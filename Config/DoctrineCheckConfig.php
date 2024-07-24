@@ -6,6 +6,7 @@ namespace Nighten\DoctrineCheck\Config;
 
 use Doctrine\Persistence\ObjectManager;
 use Nighten\DoctrineCheck\Check\Contract\AssociationMappingCheckerInterface;
+use Nighten\DoctrineCheck\Check\Contract\EmbeddedMappingCheckerInterface;
 use Nighten\DoctrineCheck\Check\Contract\FieldMappingCheckerInterface;
 use Nighten\DoctrineCheck\Console\ConsoleInputConfigurationFactoryInterface;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
@@ -37,6 +38,8 @@ class DoctrineCheckConfig
     private ?PhpTypeResolverInterface $phpTypeResolver = null;
 
     private ?FieldMappingCheckerInterface $fieldMappingChecker = null;
+
+    private ?EmbeddedMappingCheckerInterface $embeddedMappingChecker = null;
 
     private ?AssociationMappingCheckerInterface $associationMappingChecker = null;
 
@@ -166,6 +169,9 @@ class DoctrineCheckConfig
         return null !== $this->phpTypeResolver;
     }
 
+    /**
+     * @throws DoctrineCheckException
+     */
     public function getPhpTypeResolver(): PhpTypeResolverInterface
     {
         if (null === $this->phpTypeResolver) {
@@ -187,14 +193,24 @@ class DoctrineCheckConfig
         return $this->checkNullAtIdFields;
     }
 
+    public function setFieldMappingChecker(?FieldMappingCheckerInterface $fieldMappingChecker): void
+    {
+        $this->fieldMappingChecker = $fieldMappingChecker;
+    }
+
     public function getFieldMappingChecker(): ?FieldMappingCheckerInterface
     {
         return $this->fieldMappingChecker;
     }
 
-    public function setFieldMappingChecker(?FieldMappingCheckerInterface $fieldMappingChecker): void
+    public function setEmbeddedMappingChecker(?EmbeddedMappingCheckerInterface $embeddedMappingChecker): void
     {
-        $this->fieldMappingChecker = $fieldMappingChecker;
+        $this->embeddedMappingChecker = $embeddedMappingChecker;
+    }
+
+    public function getEmbeddedMappingChecker(): ?EmbeddedMappingCheckerInterface
+    {
+        return $this->embeddedMappingChecker;
     }
 
     public function getAssociationMappingChecker(): ?AssociationMappingCheckerInterface

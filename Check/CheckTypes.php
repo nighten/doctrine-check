@@ -91,6 +91,22 @@ class CheckTypes
         if (null === $reflectionClass) {
             throw new DoctrineCheckException('Fail while getting ReflectionClass for ' . $metadata->getName());
         }
+
+        $embeddedMappingChecker = $config->getEmbeddedMappingChecker();
+        if (null !== $embeddedMappingChecker) {
+            foreach ($metadata->embeddedClasses as $fieldName => $embeddedClass) {
+                $embeddedMappingChecker->checkEmbedded(
+                    $fieldName,
+                    $metadata,
+                    $reflectionClass,
+                    $config,
+                    $metadataReader,
+                    $ignoreStorage,
+                    $result,
+                );
+            }
+        }
+
         $fieldMappingChecker = $config->getFieldMappingChecker();
         if (null !== $fieldMappingChecker) {
             foreach ($metadata->getFieldNames() as $fieldName) {

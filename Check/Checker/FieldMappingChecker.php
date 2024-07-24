@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Check\Checker;
 
-use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Nighten\DoctrineCheck\Config\DoctrineCheckConfig;
 use Nighten\DoctrineCheck\Doctrine\DoctrineFieldMapping;
@@ -32,7 +31,22 @@ class FieldMappingChecker implements FieldMappingCheckerInterface
         Result $result,
     ): void {
         $result->addProcessedField($reflectionClass->getName(), $fieldName);
-        $phpType = $config->getPhpTypeResolver()->resolve($fieldName, $metadata, $reflectionClass);
+
+        $doctrineFiledMapping = $metadataReader->getFieldMapping($metadata, $fieldName);
+
+        $phpType = $this->getPhpType(
+            $fieldName,
+            $doctrineFiledMapping,
+            $config,
+            $metadata,
+            $reflectionClass,
+            $result,
+        );
+
+        if (null === $phpType) {
+            return;
+        }
+
         if (!$phpType->isResolved()) {
             //TODO: need implement resolve all php types and cases
             $result->addSkipped(
@@ -42,7 +56,7 @@ class FieldMappingChecker implements FieldMappingCheckerInterface
             );
             return;
         }
-        $doctrineFiledMapping = $metadataReader->getFieldMapping($metadata, $fieldName);
+
         if (!$this->checkTypeInConfig(
             $config,
             $doctrineFiledMapping->getType(),
@@ -53,6 +67,7 @@ class FieldMappingChecker implements FieldMappingCheckerInterface
         )) {
             return;
         }
+
         $this->checkType(
             $config,
             $phpType,
@@ -70,6 +85,85 @@ class FieldMappingChecker implements FieldMappingCheckerInterface
             $fieldName,
             $ignoreStorage,
             $result,
+        );
+    }
+
+    /**
+     * @param ClassMetadata<object> $metadata
+     * @param ReflectionClass<object> $reflectionClass
+     * @throws DoctrineCheckException
+     */
+    private function getPhpType(
+        string $fieldName,
+        DoctrineFieldMapping $doctrineFiledMapping,
+        DoctrineCheckConfig $config,
+        ClassMetadata $metadata,
+        ReflectionClass $reflectionClass,
+        Result $result,
+    ): ?PhpType {
+        //embeddable
+        if (str_contains($fieldName, '.')) {
+            return $this->resolveEmbeddedType(
+                $fieldName,
+                $doctrineFiledMapping,
+                $config,
+                $metadata,
+                $result,
+            );
+        }
+        return $config->getPhpTypeResolver()->resolve(
+            $reflectionClass,
+            $fieldName,
+            $metadata->parentClasses,
+        );
+    }
+
+    /**
+     * @param ClassMetadata<object> $metadata
+     * @throws DoctrineCheckException
+     */
+    private function resolveEmbeddedType(
+        string $fieldName,
+        DoctrineFieldMapping $doctrineFiledMapping,
+        DoctrineCheckConfig $config,
+        ClassMetadata $metadata,
+        Result $result,
+    ): ?PhpType {
+        $originalClass = $doctrineFiledMapping->originalClass;
+        if (null === $originalClass) {
+            $result->addSkipped(
+                $metadata->getName(),
+                $fieldName,
+                'Field name contain "." (' . $fieldName . ') but originalClass is null.'
+                . ' Need implement or fix this case',
+            );
+            return null;
+        }
+        if (!class_exists($originalClass)) {
+            $result->addSkipped(
+                $metadata->getName(),
+                $fieldName,
+                'Field name contain "." (' . $fieldName . ') but originalClass "'
+                . $originalClass . '" is not exists.'
+                . ' Need implement or fix this case',
+            );
+            return null;
+        }
+
+        $originalField = $doctrineFiledMapping->originalField;
+        if (null === $originalField) {
+            $result->addSkipped(
+                $metadata->getName(),
+                $fieldName,
+                'Field name contain "." (' . $fieldName . ') but originalField is null.'
+                . ' Need implement or fix this case',
+            );
+            return null;
+        }
+        return $config->getPhpTypeResolver()->resolve(
+            $originalClass,
+            $originalField,
+            [],
         );
     }
 
