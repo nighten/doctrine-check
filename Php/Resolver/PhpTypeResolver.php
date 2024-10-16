@@ -39,19 +39,27 @@ class PhpTypeResolver implements PhpTypeResolverInterface
         }
         $result = new PhpType();
         if (!$reflectionClass->hasProperty($fieldName) && count($metadataParentClasses) > 0) {
-            //TODO: implement that logic (inheritance)
-            $result->setComment(
-                'Handle inheritance is not implemented yet. Parent classes: '
-                . implode('|', $metadataParentClasses)
-            );
-            return $result;
-        }
-        if (!$reflectionClass->hasProperty($fieldName)) {
+            $prop = null;
+            foreach ($metadataParentClasses as $parentClass) {
+                $reflectionParentClass = new ReflectionClass($parentClass);
+                if ($reflectionParentClass->hasProperty($fieldName)) {
+                    $prop = $reflectionParentClass->getProperty($fieldName);
+                }
+            }
+            if (null === $prop) {
+                $result->setComment(
+                    'Case with handle inheritance is not implemented yet. Parent classes: '
+                    . implode('|', $metadataParentClasses)
+                );
+                return $result;
+            }
+        } elseif (!$reflectionClass->hasProperty($fieldName)) {
             //TODO: implement that logic (inheritance)
             $result->setComment('Handle inheritance is not implemented yet. Class does not have property.');
             return $result;
+        } else {
+            $prop = $reflectionClass->getProperty($fieldName);
         }
-        $prop = $reflectionClass->getProperty($fieldName);
         $type = $prop->getType();
         if (null === $type) {
             $this->resolveFromPHPDoc($prop, $result);
