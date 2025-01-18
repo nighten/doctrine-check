@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nighten\DoctrineCheck\Php\Resolver;
 
+use Nighten\DoctrineCheck\Config\DoctrineCheckConfig;
 use Nighten\DoctrineCheck\Dto\PhpType;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Php\PHPDocParser\PHPDocParserInterface;
@@ -31,6 +32,7 @@ class PhpTypeResolver implements PhpTypeResolverInterface
         string $fieldName,
         //TODO: probably need remove from this method
         array $metadataParentClasses,
+        DoctrineCheckConfig $config,
     ): PhpType {
         if (is_string($class)) {
             $reflectionClass = new ReflectionClass($class);
@@ -62,7 +64,7 @@ class PhpTypeResolver implements PhpTypeResolverInterface
         }
         $type = $prop->getType();
         if (null === $type) {
-            $this->resolveFromPHPDoc($prop, $result);
+            $this->resolveFromPHPDoc($prop, $result, $config);
             return $result;
         }
 
@@ -70,15 +72,18 @@ class PhpTypeResolver implements PhpTypeResolverInterface
         return $result;
     }
 
-    private function resolveFromPHPDoc(ReflectionProperty $prop, PhpType $result): void
-    {
+    private function resolveFromPHPDoc(
+        ReflectionProperty $prop,
+        PhpType $result,
+        DoctrineCheckConfig $config,
+    ): void {
         $docComment = $prop->getDocComment();
         if (false === $docComment) {
             //TODO: implement that logic (property without type)
             $result->setComment('Handle property without type is not implemented yet.');
             return;
         }
-        $phpDoc = $this->PHPDocParser->parse($docComment);
+        $phpDoc = $this->PHPDocParser->parse($docComment, $config);
         $phpDocTypes = $phpDoc->getTypes();
         if ([] === $phpDocTypes) {
             //TODO: implement that logic (property without type)

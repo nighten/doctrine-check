@@ -46,6 +46,7 @@ class AssociationMappingChecker implements AssociationMappingCheckerInterface
             $reflectionClass,
             $fieldName,
             $metadata->parentClasses,
+            $config,
         );
 
         $targetEntityClassName = $associationMapping->targetEntity;

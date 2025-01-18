@@ -115,6 +115,7 @@ class FieldMappingChecker implements FieldMappingCheckerInterface
             $reflectionClass,
             $fieldName,
             $metadata->parentClasses,
+            $config,
         );
     }
 
@@ -164,6 +165,7 @@ class FieldMappingChecker implements FieldMappingCheckerInterface
             $originalClass,
             $originalField,
             [],
+            $config,
         );
     }
 

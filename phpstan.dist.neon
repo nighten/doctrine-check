@@ -13,3 +13,7 @@ parameters:
         - Ignore/
         - Php/
         - Type/
+    excludePaths:
+        analyseAndScan:
+            # it depends on PhpdocParser version
+            - Php/PHPDocParser/Bridge/PhpstanPhpdocParserV*.php

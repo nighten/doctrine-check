@@ -36,6 +36,7 @@ class EmbeddedMappingChecker implements EmbeddedMappingCheckerInterface
             $reflectionClass,
             $fieldName,
             $metadata->parentClasses,
+            $config,
         );
         if (!$phpType->isResolved()) {
             //TODO: need implement resolve all php types and cases

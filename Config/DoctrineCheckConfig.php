@@ -8,11 +8,13 @@ use Doctrine\Persistence\ObjectManager;
 use Nighten\DoctrineCheck\Check\Contract\AssociationMappingCheckerInterface;
 use Nighten\DoctrineCheck\Check\Contract\EmbeddedMappingCheckerInterface;
 use Nighten\DoctrineCheck\Check\Contract\FieldMappingCheckerInterface;
+use Nighten\DoctrineCheck\Check\Contract\PackageVersionProviderInterface;
 use Nighten\DoctrineCheck\Console\ConsoleInputConfigurationFactoryInterface;
 use Nighten\DoctrineCheck\Doctrine\MetadataReaderInterface;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Ignore\IgnoreStorage;
 use Nighten\DoctrineCheck\Php\Resolver\PhpTypeResolverInterface;
+use Nighten\DoctrineCheck\Provider\PackageVersionProvider;
 
 class DoctrineCheckConfig
 {
@@ -45,11 +47,16 @@ class DoctrineCheckConfig
 
     private ?ConsoleInputConfigurationFactoryInterface $consoleInputConfigurationFactory = null;
 
+    private PackageVersionProviderInterface $defaultPackageVersionProvider;
+
+    private ?PackageVersionProviderInterface $packageVersionProvider = null;
+
     private bool $checkNullAtIdFields = true;
 
     public function __construct()
     {
         $this->ignores = new IgnoreStorage();
+        $this->defaultPackageVersionProvider = new PackageVersionProvider();
     }
 
     public function addObjectManager(
@@ -289,5 +296,18 @@ class DoctrineCheckConfig
     public function existExcludedEntityClasses(string $entityClass): bool
     {
         return array_key_exists($entityClass, $this->excludedEntityClasses);
+    }
+
+    public function getPackageVersionProvider(): PackageVersionProviderInterface
+    {
+        if (null !== $this->packageVersionProvider) {
+            return $this->packageVersionProvider;
+        }
+        return $this->defaultPackageVersionProvider;
+    }
+
+    public function setPackageVersionProvider(?PackageVersionProviderInterface $packageVersionProvider): void
+    {
+        $this->packageVersionProvider = $packageVersionProvider;
     }
 }
