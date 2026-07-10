@@ -40,5 +40,13 @@ $app = new Application('Check doctrine console app');
 $enumTestCommand = new CheckTypesCommand(
     new ConfigResolver(),
 );
-$app->add($enumTestCommand);
+if (method_exists($app, 'addCommand')) {
+    // Symfony 8+
+    $app->addCommand($enumTestCommand);
+} elseif (method_exists($app, 'add')) {
+    // Symfony 7 and lower
+    $app->add($enumTestCommand);
+} else {
+    throw new \RuntimeException('Cannot add command to Application');
+}
 exit($app->run());

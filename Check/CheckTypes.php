@@ -12,6 +12,7 @@ use Nighten\DoctrineCheck\Dto\Result;
 use Nighten\DoctrineCheck\Dto\ResultCollection;
 use Nighten\DoctrineCheck\Exception\DoctrineCheckException;
 use Nighten\DoctrineCheck\Ignore\IgnoreStorage;
+use ReflectionClass;
 
 class CheckTypes
 {
@@ -87,6 +88,7 @@ class CheckTypes
         IgnoreStorage $ignoreStorage,
         Result $result,
     ): void {
+        /** @var ReflectionClass<object>|null $reflectionClass */
         $reflectionClass = $metadata->getReflectionClass();
         if (null === $reflectionClass) {
             throw new DoctrineCheckException('Fail while getting ReflectionClass for ' . $metadata->getName());
